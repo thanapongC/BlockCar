@@ -1,4 +1,4 @@
-
+la
 #include "Wire.h"
 #include "SPI.h"  
 #include "RTClib.h"
@@ -51,10 +51,10 @@ void setup () {
     pinMode(ALCOHOL_DAT,INPUT);
 
     //เปิด
-    myservo.write(-180);
+    myservo.write(180);
     delay(1000);
     
-    EEPROM.write(0, 0);
+    EEPROM.write(0, 1);
 
 }
 
@@ -92,13 +92,21 @@ void loop () {
                         Serial.println(now.second(), DEC);
             //start car
      //ถ้ารถสตาร์ทอยู่ให้ปิดรูกุญเเจ
-                if(val2 > 12){      
+                if(val2 > 12){
+                                         value = EEPROM.read(address);
+                                         while(value == 0){
+                                            myservo.write(180);
+                                            delay(1000);
+                                            EEPROM.update(0, 1);
+                                         }
+                  }else{    
+                      
                   Serial.println("Start System");
 
-                  if(now.hour() >= 0 && now.minute() >= 0 && now.hour() <= 6){
+                  if(now.hour() >= 0 && now.minute() >= 0){
                    Serial.println("Time Start");
                    
-                                          //สมมุติว่ารูปิด
+                                       
                                           value = EEPROM.read(address);
                                           while(value == 1){
                                                 myservo.write(-180);
@@ -106,11 +114,11 @@ void loop () {
                                                 EEPROM.update(0, 0);
                                           }
                                         
-                                        
-                   digitalWrite(bluPin, HIGH);//สีน้ำเงิน
-                   delay(1000);
-                   digitalWrite(bluPin, LOW);//สีน้ำเงิน
-                   delay(1000);
+                                                      
+                                 digitalWrite(bluPin, HIGH);//สีน้ำเงิน
+                                 delay(1000);
+                                 digitalWrite(bluPin, LOW);//สีน้ำเงิน
+                                 delay(1000);
 
                 //กดเพื่อ heat
                     
@@ -131,65 +139,56 @@ void loop () {
                                       sensorValue = analogRead(ALCOHOL_DAT); //read the analog value
                                       int value = 1023 - sensorValue;
                                       Serial.println(value);
-                                      if(value < 200){
-                                        //ไม่เกิน
-                                        Serial.println("min");
-                                        digitalWrite(grnPin, HIGH); //สีเขียว
-                                        digitalWrite(redPin, LOW); 
-                                        digitalWrite(bluPin, LOW); 
-
-                                         value = EEPROM.read(address);
-                                         while(value == 0){
-                                            myservo.write(180);
-                                            delay(1000);
-                                            EEPROM.update(0, 1);
-                                         }
-                                      }
-                                      else if((value > 300) && (value < 500)){
-                                        //เกิน
-                                       Serial.println("max");
-                                       digitalWrite(redPin, HIGH); //สีเเดง
-                                       digitalWrite(grnPin, LOW); 
-                                       digitalWrite(bluPin, LOW); 
-
-                                       value = EEPROM.read(address);
-                                       while(value == 1){
-                                          myservo.write(-180);
-                                          delay(1000);
-                                          EEPROM.update(0, 0);
-                                       }
-                                       
-                                      }
-                                      delay(100);
+                                              if(value < 200){
+                                                //ไม่เกิน
+                                                        Serial.println("min");
+                                                        digitalWrite(grnPin, HIGH); //สีเขียว
+                                                        digitalWrite(redPin, LOW); 
+                                                        digitalWrite(bluPin, LOW); 
+                
+                                                 value = EEPROM.read(address);
+                                                 while(value == 0){
+                                                    myservo.write(180);
+                                                    delay(1000);
+                                                    EEPROM.update(0, 1);
+                                                 }
+                                              }else if((value > 300) && (value < 500)){
+                                                //เกิน
+                                                       Serial.println("max");
+                                                       digitalWrite(redPin, HIGH); //สีเเดง
+                                                       digitalWrite(grnPin, LOW); 
+                                                       digitalWrite(bluPin, LOW); 
+                
+                                                 value = EEPROM.read(address);
+                                                 while(value == 1){
+                                                    myservo.write(-180);
+                                                    delay(1000);
+                                                    EEPROM.update(0, 0);
+                                               } 
+                                              }
+                                        delay(100);
                                    }   
                       }  
-                                       
-                    }else if(now.hour() >= 6 && now.minute() >= 0){
-                       //myservo.write(50);    
-                       Serial.println("Not use");
-                       digitalWrite(redPin, HIGH);//สีเเดง
-                       delay(1000);
-                       digitalWrite(redPin, LOW);//สีเเดง
-                       delay(1000);
+                                 
+              }else if(now.hour() >= 6 && now.minute() >= 0){
+                 //myservo.write(50);    
+                 Serial.println("Not use");
+                 digitalWrite(redPin, HIGH);//สีเเดง
+                 delay(1000);
+                 digitalWrite(redPin, LOW);//สีเเดง
+                 delay(1000);
 
-                       value = EEPROM.read(address);
-                          //เปิด
-                         while(value == 0){
-                          myservo.write(180);
-                          delay(1000);
-                          EEPROM.update(0, 1);
-                         }
-                        
-                   
-                      }
-                }else{
-    //เปิด
-    while(value == 0){
-    myservo.write(180);
-    delay(1000);
-    EEPROM.update(0, 1);
-    }
-                }          
+                 value = EEPROM.read(address);
+                    //เปิด
+                   while(value == 0){
+                    myservo.write(180);
+                    delay(1000);
+                    EEPROM.update(0, 1);
+                   }
+                  
+             
+                }
+              }
 
   delay(1000);
 }
